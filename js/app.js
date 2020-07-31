@@ -16,6 +16,7 @@ class Places {
         ui.contAllCountries.innerHTML = '';
 
         countries.forEach(country => {
+            console.log(country);
             ui.contAllCountries.innerHTML += `
             <div class="col-12 col-md-4 col-lg-3">
             <div class="card mb-3">
@@ -25,7 +26,7 @@ class Places {
             <p class="card-text mb-0"><b>Capital: </b>${country.capital}</p>
             <p class="card-text mb-0"><b>Continente: </b>${country.region}</p>
             <p class="card-text mb-0"><b>Población: </b>${country.population}</p>
-            <a href="#" class="btn btn-block btn-primary mt-3">Ver más</a>
+            <a href="country.php?code=${country.alpha3Code}" class="btn btn-block btn-primary mt-3">Ver más</a>
             </div>
             </div>
             </div>
@@ -45,7 +46,6 @@ class Places {
         else {
             this.listAllCountries(countries);
         }
-        console.log(countries);
     }
 
     async getCountriesByRegion(region) {
@@ -58,6 +58,33 @@ class Places {
             this.listAllCountries(countries);
         }
 
+    }
+
+    async getCountryByCode(code) {
+        const response = await fetch(this.apiUrl + `alpha?codes=${code}`);
+        const country = await response.json();
+        this.printCountry(country[0]);
+    }
+
+    printCountry(country) {
+        ui.countryFlag.src = country.flag;
+        ui.txtRegion.innerHTML = country.region;
+        ui.txtCountryName.innerHTML = country.name;
+        ui.txtCapital.innerHTML = country.capital;
+        ui.txtPopulation.innerHTML = country.population;
+        ui.txtCurrency.innerHTML = country.currencies[0].name;
+
+        country.languages.forEach(language => {
+            ui.listLanguages.innerHTML += `
+            <span class="badge badge-primary mx-2">${language.name}</span>
+            `;
+        });
+
+        country.borders.forEach(border => {
+            ui.listBorders.innerHTML += `
+            <a href="country.php?code=${border}"><span class="badge badge-primary mx-2">${border}</span></a>
+            `;
+        });
     }
 
 }
@@ -73,6 +100,17 @@ class UI {
         this.previousValueCountry;
         this.typingTimer;
         this.selectRegion = document.querySelector('#region');
+
+        //Country
+        this.contCountry = document.querySelector('#cont-country');
+        this.countryFlag = document.querySelector('#countryFlag');
+        this.txtCapital = document.querySelector('#txtCapital');
+        this.txtRegion = document.querySelector('#txtRegion');
+        this.txtCountryName = document.querySelector('#txtCountryName');
+        this.txtPopulation = document.querySelector('#txtPopulation');
+        this.txtCurrency = document.querySelector('#txtCurrency');
+        this.listLanguages = document.querySelector('#listLanguages');
+        this.listBorders = document.querySelector('#listBorders');
     }
 
     showAlert(message, type) {
@@ -88,7 +126,7 @@ class UI {
         ui.contAllCountries.innerHTML = '';
     }
 
-    init(){
+    initCountries() {
         this.showLoading();
         places.getAllCountries();
     }
@@ -113,9 +151,7 @@ class UI {
     }
 
     onChangeRegion() {
-
         this.showLoading();
-
         places.getCountriesByRegion(this.selectRegion.value);
     }
 }
@@ -124,9 +160,12 @@ const ui = new UI();
 const places = new Places();
 
 if (ui.contAllCountries) {
-    ui.init();
+    ui.initCountries();
+    //Events
+    ui.inputCountrySearch.addEventListener('keyup', ui.typingSearchCountry.bind(ui));
+    ui.selectRegion.addEventListener('change', ui.onChangeRegion.bind(ui));
 }
 
-//Events
-ui.inputCountrySearch.addEventListener('keyup', ui.typingSearchCountry.bind(ui));
-ui.selectRegion.addEventListener('change', ui.onChangeRegion.bind(ui));
+if (ui.contCountry) {
+    places.getCountryByCode(location.search.split('=')[1]);
+}
