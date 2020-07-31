@@ -23,6 +23,7 @@
             <h1>Listado de Países</h1>
         </div>
     </div>
+    <div id="cont-alert"></div>
     <div id="allCountries" class="row">
     </div><!-- .row -->
 </div><!-- .container -->
