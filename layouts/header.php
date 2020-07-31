@@ -9,8 +9,15 @@
 </head>
 
 <body>
-    <nav aria-label="breadcrumb">
+    <nav aria-label="breadcrumb" class="navbar navbar-dark bg-dark">
         <ol class="breadcrumb">
             <li class="breadcrumb-item"><a href="index.php">Inicio</a></li>
+            <li class="breadcrumb-item">
+                <div class="custom-control custom-switch">
+                    <input type="checkbox" class="custom-control-input" id="customSwitch1">
+                    <label class="custom-control-label" for="customSwitch1">Cambiar modo</label>
+                </div>
+
+            </li>
         </ol>
     </nav>
